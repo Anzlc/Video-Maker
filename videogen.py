@@ -1,0 +1,101 @@
+import praw
+from redvid import Downloader
+from moviepy.editor import *
+from moviepy.video.fx.resize import resize
+import datetime
+import random
+
+
+def gen_reddit_compilation(subreddit: str, search_posts: int, max_video_length: int, max_duration: int,
+                           title_length: int):
+    """
+
+    :param subreddit: string
+        A name of a subreddit without r/
+    :param search_posts: int
+        A maximum amount of top posts to be searched
+    :param max_video_length: int
+        A maximum Reddit video duration in seconds
+    :param max_duration: int
+        A maximum duration of the final video
+    :param title_length: int
+        Duration for how long should the title be displayed in seconds
+
+    """
+
+    reddit = praw.Reddit(
+        client_id=os.getenv('CLIENT_ID'),
+        client_secret=os.getenv('SECRET'),
+        user_agent=f"python:video-maker:v0.0.1 (by {os.getenv('REDDIT_USERNAME')})"
+    )
+    duration = 0
+    videos = []
+
+    subreddit = reddit.subreddit(subreddit)
+    top_posts = subreddit.top(limit=search_posts, time_filter="day")
+
+    filenames = []
+
+    txt_clip = TextClip(f"Top r/{subreddit.display_name} posts on "
+                        f"{datetime.datetime.now().day}/{datetime.datetime.now().month}/{datetime.datetime.now().year}",
+                        fontsize=50, color='white', size=(1080, 1920))
+    txt_clip = txt_clip.set_pos('center').set_duration(title_length)
+    videos.append(txt_clip)
+    duration += txt_clip.duration
+    for i, post in enumerate(top_posts):
+        try:
+            down = Downloader(max_q=True)
+            down.url = post.url
+
+            down.path = f"videos/"
+            down.check()
+            down.filename = f"video {i}"
+
+            if down.duration < max_video_length:
+                if duration + down.duration + 1 <= max_duration:
+                    down.download()
+                    filenames.append((down.file_name.replace("\\", ""), down.duration))
+                    duration += down.duration
+
+            else:
+                print(f"Skipping because video is longer then {max_video_length} seconds")
+        except:
+            print("Error occurred!")
+
+    print(filenames)
+
+    if len(filenames) > 0:
+        for file in filenames:
+            video = VideoFileClip(file[0])
+            video = resize(video, width=1080)
+
+            videos.append(video)
+
+        final = concatenate_videoclips(videos, method="compose")
+
+        final = resize(final, width=1080)
+
+        final.write_videofile("final.mp4", fps=30)
+
+
+def gen_motivational(name: str = "final"):
+    """
+
+    :param name: string
+        Optional name for the file. Default 'final'.
+    """
+    motivational_videos = ["mot1.mp4", "mot2.mp4", "mot3.mp4", "mot4.mp4"]
+    motivational_music = ["motmusic1.mp3", "motmusic2.mp3", "motmusic3.mp3"]
+
+    with open("motivational/lines.txt", "r") as f:
+        line = random.choice(f.readlines())
+
+    motivational_video = VideoFileClip(f"motivational/{random.choice(motivational_videos)}")
+    motivational_music = AudioFileClip(f"motivational/{random.choice(motivational_music)}").subclip(t_start=2)
+    motivational_line = TextClip(random.choice(line),
+                                 fontsize=45, method="caption", font="Work-Sans-Regular", color='white',
+                                 size=(1000, None)).set_position("center").set_duration(motivational_video.duration)
+
+    video = CompositeVideoClip([motivational_video, motivational_line])
+    video.audio = motivational_music.set_duration(motivational_video.duration)
+    video.write_videofile(f"motivational/{name}.mp4")
