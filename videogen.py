@@ -84,15 +84,20 @@ def gen_motivational(name: str = "final"):
     :param name: string
         Optional name for the file. Default 'final'.
     """
+
+    # file paths for background videos and music
     motivational_videos = ["mot1.mp4", "mot2.mp4", "mot3.mp4", "mot4.mp4"]
     motivational_music = ["motmusic1.mp3", "motmusic2.mp3", "motmusic3.mp3"]
 
+
+
+    # file path for a file with motivational lines
     with open("motivational/lines.txt", "r") as f:
         line = random.choice(f.readlines())
 
     motivational_video = VideoFileClip(f"motivational/{random.choice(motivational_videos)}")
     motivational_music = AudioFileClip(f"motivational/{random.choice(motivational_music)}").subclip(t_start=2)
-    motivational_line = TextClip(random.choice(line),
+    motivational_line = TextClip(line,
                                  fontsize=45, method="caption", font="Work-Sans-Regular", color='white',
                                  size=(1000, None)).set_position("center").set_duration(motivational_video.duration)
 
