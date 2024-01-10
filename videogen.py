@@ -4,6 +4,8 @@ from moviepy.editor import *
 from moviepy.video.fx.resize import resize
 import datetime
 import random
+import glob
+
 
 
 def gen_reddit_compilation(subreddit: str, search_posts: int, max_video_length: int, max_duration: int,
@@ -86,8 +88,8 @@ def gen_motivational(name: str = "final"):
     """
 
     # file paths for background videos and music
-    motivational_videos = ["mot1.mp4", "mot2.mp4", "mot3.mp4", "mot4.mp4"]
-    motivational_music = ["motmusic1.mp3", "motmusic2.mp3", "motmusic3.mp3"]
+    motivational_videos = glob.glob("/motivational/background/*.mp4")
+    motivational_music = glob.glob("/motivational/music/*.mp3")
 
 
 
