@@ -7,7 +7,6 @@ import random
 import glob
 
 
-
 def gen_reddit_compilation(subreddit: str, search_posts: int, max_video_length: int, max_duration: int,
                            title_length: int):
     """
@@ -90,6 +89,9 @@ def gen_motivational(name: str = "final"):
     # file paths for background videos and music
     motivational_videos = glob.glob("motivational/background/*.mp4")
     motivational_music = glob.glob("motivational/music/*.mp3")
+
+    if len(motivational_videos) == 0 or len(motivational_music) == 0:
+        raise Exception("No files found in background or music")
 
     print(motivational_videos)
     print(motivational_music)
