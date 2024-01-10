@@ -88,17 +88,18 @@ def gen_motivational(name: str = "final"):
     """
 
     # file paths for background videos and music
-    motivational_videos = glob.glob("/motivational/background/*.mp4")
-    motivational_music = glob.glob("/motivational/music/*.mp3")
+    motivational_videos = glob.glob("motivational/background/*.mp4")
+    motivational_music = glob.glob("motivational/music/*.mp3")
 
-
+    print(motivational_videos)
+    print(motivational_music)
 
     # file path for a file with motivational lines
     with open("motivational/lines.txt", "r") as f:
         line = random.choice(f.readlines())
 
-    motivational_video = VideoFileClip(f"motivational/{random.choice(motivational_videos)}")
-    motivational_music = AudioFileClip(f"motivational/{random.choice(motivational_music)}").subclip(t_start=2)
+    motivational_video = VideoFileClip(f"{random.choice(motivational_videos)}")
+    motivational_music = AudioFileClip(f"{random.choice(motivational_music)}").subclip(t_start=2)
     motivational_line = TextClip(line,
                                  fontsize=45, method="caption", font="Work-Sans-Regular", color='white',
                                  size=(1000, None)).set_position("center").set_duration(motivational_video.duration)
